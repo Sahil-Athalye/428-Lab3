@@ -25,6 +25,8 @@ class GoFishGame : public Game {
         std::vector<std::string> player_names;
         virtual void deal();
         bool turn(int player_number);
+    private:
+        std::set<int> finished_players;
 };
 
 

@@ -32,7 +32,7 @@ template <typename R, typename S> class CardSet{
         iter get_end();
         void sort_cardvec();
         void collect(CardSet<rank_type,suit_type>&);
-        void collect_if(CardSet<rank_type,suit_type> deck, std::function<bool(Card<R, S>&)>);
+        void collect_if(CardSet<rank_type,suit_type> & deck, std::function<bool(Card<R, S>&)>);
         bool request(CardSet<rank_type,suit_type>& deck, R rank);
     protected:
         std::vector< Card<R,S> > cardvec;

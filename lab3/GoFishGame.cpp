@@ -58,7 +58,7 @@ int GoFishGame<S, R, D>::play() {
     }
 
     int round_num = 1;
-    std::set<int> finished_players;
+    
     while(finished_players.size() < hands.size()-1){
         
 
@@ -67,10 +67,7 @@ int GoFishGame<S, R, D>::play() {
                 continue;
             }
 
-            bool successful_turn = turn(i+1);
-            if(!successful_turn){
-                finished_players.insert(i);
-            }
+            while (turn(i+1)) {}
         }
 
         if(deck.is_empty()){
@@ -113,7 +110,7 @@ void GoFishGame<S, R, D>::deal() {
 
 template <typename S, typename R, typename D>
 bool GoFishGame<S, R, D>::collect_books(int player_num){
-    CardSet<R, S> player_hand = hands[player_num-1];
+    CardSet<R, S> & player_hand = hands[player_num-1];
     std::vector<int> rank_counts(static_cast<int>(R::undefined));
     for(auto iter = player_hand.get_start();iter!=player_hand.get_end();iter++){
         Card<R,S> curr_card = *iter;
@@ -207,12 +204,12 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
 
         
 
-        if(from_player_num==player_num){
+        if(from_player_num == player_num){
             std::cout << "Cannot fish for card from yourself"<<std::endl;
             continue;
         }
 
-        if(!(from_player_num >= 1 && from_player_num <= hands.size())){
+        if(!(from_player_num >= 1 && (unsigned) from_player_num <= hands.size())){
             std::cout << "Please input valid player number between "<<1<<" and "<<hands.size()<<std::endl;
             continue;
         }
@@ -229,7 +226,8 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
     } else {
         if (deck.is_empty()) {
             std::cout << "Player " << player_num << " is removed from the game" << std::endl;
-            // TODO step 19: indicate player take no more moves;
+            finished_players.insert(player_num-1);
+            deck.collect(hands[player_num-1]);
             return false;
         } else {
             std::cout<<"GO FISH"<<std::endl;
