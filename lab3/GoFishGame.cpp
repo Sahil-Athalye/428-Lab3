@@ -167,21 +167,53 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
         std::cin >> rank_str;
 
         try{
-            std::stoi(rank_str);
+            rank_num = std::stoi(rank_str);
         }
         catch (std::invalid_argument const& ex){
             std::cout << "Please input rank in digit form"<<std::endl;
             continue;
         }
         
+        if (std::is_same<R, PokerRank>::value) {
+            // if poker rank enum
+            rank_num -= 2;
+        } else if (std::is_same<R, PinochleRank>::value) {
+            // if pinochle rank
+            switch (rank_num) {
+                case 9:
+                    rank_num = 0;
+                    break;
+                case 10:
+                    rank_num = 4;
+                    break;
+                case 11:
+                    rank_num = 1;
+                    break;
+                case 12:
+                    rank_num = 2;
+                    break;
+                case 13:
+                    rank_num = 3;
+                    break;
+                case 14:
+                    rank_num = 5;
+                    break;
+                default:
+                    rank_num = 100;
+                    break;
+            }
+        }
 
-        rank_num = std::stoi(rank_str);
+        if(rank_num < 0 || (unsigned) rank_num >= static_cast<int>(R::undefined)){
+            std::cout << "Please input valid rank" <<std::endl;
+            continue;
+        }
         
         
         R curr_rank = static_cast<R>(rank_num);
         
-        typename std::vector< Card<R,S> >::iterator it = std::find_if(hands[idx].get_start(), hands[idx].get_end(), [curr_rank](Card<R,S> card){
-        return card.rank == curr_rank;
+        auto it = std::find_if(hands[idx].get_start(), hands[idx].get_end(), [curr_rank](Card<R,S> card){
+            return card.rank == curr_rank;
         });
 
         if (it == hands[idx].get_end()){
@@ -193,16 +225,12 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
         std::cin >> from_player_str;
 
         try{
-            std::stoi(from_player_str);
+            from_player_num = std::stoi(from_player_str);
         }
         catch (std::invalid_argument const& ex){
             std::cout << "Please input player number in digit form"<<std::endl;
             continue;
         }
-        
-        from_player_num = std::stoi(from_player_str);
-
-        
 
         if(from_player_num == player_num){
             std::cout << "Cannot fish for card from yourself"<<std::endl;
