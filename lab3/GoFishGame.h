@@ -1,3 +1,9 @@
+// GoFishGame.h
+// authors: Sahil Athalye
+//          Yuheng Ding
+//          Reedham Kalariya
+//This file declares class GoFishGame which inherits from base class Game
+
 #pragma once
 
 #include "Deck.h"
@@ -22,6 +28,7 @@ class GoFishGame : public Game {
         D deck;
         std::vector<CardSet<R, S>> hands;
         std::vector<CardSet<R, S>> books;
+        std::vector<int> book_nums;
         std::vector<std::string> player_names;
         virtual void deal();
         bool turn(int player_number);

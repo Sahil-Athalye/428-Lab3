@@ -13,10 +13,6 @@
 
 #include "Card.h"
 
-// template <typename R, typename S> class CardSet;
-
-// template <typename R, typename S>
-// CardSet<R,S>& operator>><R,S>(CardSet<R, S> &setOfCards);
 
 template <typename R, typename S> class CardSet{
     public:

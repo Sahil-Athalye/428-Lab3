@@ -1,3 +1,9 @@
+// Uno.h
+// authors: Sahil Athalye
+//          Yuheng Ding
+//          Reedham Kalariya
+// This files declares enum types Color and UnoRank as well as their operators. It also declares the constructor for UnoDeck
+
 #pragma once
 
 #include <iostream>

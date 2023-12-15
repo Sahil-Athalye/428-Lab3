@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 //          Yuheng Ding
 //          Reedham Kalariya
-// This files defines class methods for Game
+// This files defines the constructor for Game
 
 #include "Game.h"
 

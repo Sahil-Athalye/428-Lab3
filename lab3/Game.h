@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 //          Yuheng Ding
 //          Reedham Kalariya
-// This files declares base class Game
+// This files declares base class Game with its constructor, pure virtual function play(), and member variable for playerNames
 
 #pragma once
 

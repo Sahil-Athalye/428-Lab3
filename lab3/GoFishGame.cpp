@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 //          Yuheng Ding
 //          Reedham Kalariya
-// 
+//This file defines gameplay for GoFishGame with its constructor, play, turn, and deal functions
 
 #define MIN_PLAYERS 2
 #define MIN_RANKS 4
@@ -23,7 +23,8 @@ template <typename S, typename R, typename D>
 GoFishGame<S, R, D>::GoFishGame(int num_players, const char* player_names[]): Game(num_players, player_names){
     books = (std::vector<CardSet<R, S>>(num_players - CLI_ARGS));
     hands = (std::vector<CardSet<R, S>>(num_players - CLI_ARGS));
-    std::cout << "template constructor"<< std::endl;
+    book_nums = (std::vector<int>(num_players - CLI_ARGS));
+
     // check if the deck has at least 4 of each rank
     for (R r = static_cast<R>(0); r < R::undefined; ++r) {
         unsigned num = count_if(deck.get_start(), deck.get_end(), [r](const Card<R, S> & card) {
@@ -59,8 +60,15 @@ int GoFishGame<S, R, D>::play() {
 
     int round_num = 1;
     
+    bool last_round = false;
+    
     while(finished_players.size() < hands.size()-1){
         
+        std::cout<<""<<std::endl;
+        std::cout<<"IT IS ROUND #"<<round_num<<std::endl;
+        std::cout<<""<<std::endl;
+
+        round_num++;
 
         for(unsigned int i = 0; i<hands.size();i++){
             if(finished_players.find(i) != finished_players.end()){
@@ -70,16 +78,53 @@ int GoFishGame<S, R, D>::play() {
             while (turn(i+1)) {}
         }
 
-        if(deck.is_empty()){
-            break;
+        for(unsigned int i = 0; i<hands.size(); i++){
+            std::cout << "player " << i+1 << " has " <<book_nums[i]<<" books"<<std::endl;
         }
 
-        std::cout<<"IT IS ROUND #"<<round_num<<std::endl;
-        round_num++;
-        //TODO STEP 21: need to print players' books and winning player
+
+        //each player still gets a chance to steal after the deck is emptied
+        if(deck.is_empty()&&!last_round){
+            last_round = true;
+        }
+
+        //once deck is empty and all players have gotten a turn the game is over
+        if(deck.is_empty()&&last_round){
+            break;
+        }
+        
 
     }
+    std::cout<<""<<std::endl;
+    std::cout<<"GAME OVER"<<std::endl;
+    std::cout<<""<<std::endl;
 
+    int max_books = -1;
+    for(unsigned int i = 0; i<books.size();i++){
+        if(book_nums[i]>max_books){
+            max_books=book_nums[i];
+        }
+    }
+
+
+    bool one_winner = true;
+    for(unsigned int i = 0; i<books.size();i++){
+        if(book_nums[i]==max_books){
+            if(one_winner){
+                std::cout<<"PLAYER "<<i+1<<" WINS WITH "<<book_nums[i]<<" BOOKS";
+                one_winner = false;
+            }
+            else{
+                std::cout<<" AND PLAYER "<<i+1<<" WINS WITH "<<book_nums[i]<<" BOOKS";
+            }
+            
+        }
+    }
+
+
+    //TODO STEP 21: need to print players' books and winning player
+
+    
     return 1;
     
 
@@ -121,22 +166,19 @@ bool GoFishGame<S, R, D>::collect_books(int player_num){
 
     for(unsigned int i = 0; i<rank_counts.size();i++){
         if(rank_counts[i] >= FOUR_OF_A_KIND){
-            auto predicate = [i](Card<R, S>& curr_card)->bool{
+            int max_four = 0;
+            auto predicate = [i, max_four](Card<R, S>& curr_card) mutable ->bool{
                 R the_rank = static_cast<R>(i);
-                if(the_rank == curr_card.rank){
-                    std::cout<<"RANK MATCH"<<std::endl;
+                if(the_rank == curr_card.rank&&max_four<4){
+                    max_four++;
                     return true;
                 }
                 else{
-                    std::cout<<"RANK MISMATCH"<<std::endl;
                     return false;
                 }
             };
-            // std::cout<<"BEFORE COLLECT_IF"<<std::endl;
-            // books[player_num-1].print(std::cout,7);
             books[player_num-1].collect_if(player_hand, predicate);
-            // std::cout<<"AFTER COLLECT_IF"<<std::endl;
-            // books[player_num-1].print(std::cout,7);
+            book_nums[player_num-1]++;
             return true;
         }
     }
@@ -146,15 +188,18 @@ bool GoFishGame<S, R, D>::collect_books(int player_num){
 
 template <typename S, typename R, typename D>
 bool GoFishGame<S, R, D>::turn(int player_num) {
-    std::cout<<"START OF PLAYER #"<<player_num<<"'s TURN"<<std::endl;
 
     int idx = player_num - 1;
 
-
-    std::cout << "player " << player_num << " hand: " << std::endl;
-    hands[idx].print(std::cout, CARDS_EACH_LINE);
-    std::cout << "book: " << std::endl;
-    books[idx].print(std::cout, CARDS_EACH_LINE);
+    for(unsigned int i = 0; i<hands.size(); i++){
+        std::cout << "player " << i+1 << " hand: " << std::endl;
+        hands[i].print(std::cout, CARDS_EACH_LINE);
+        std::cout << "books: " << std::endl;
+        books[i].print(std::cout, CARDS_EACH_LINE);
+        std::cout<<""<<std::endl;
+    }
+    
+    std::cout<<"START OF PLAYER #"<<player_num<<"'s TURN"<<std::endl;
 
     std::string rank_str;
     std::string from_player_str;
@@ -216,7 +261,7 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
             return card.rank == curr_rank;
         });
 
-        if (it == hands[idx].get_end()){
+        if (it == hands[idx].get_end()&& !hands[idx].is_empty()){
             std::cout << "Please input rank currently in hand"<<std::endl;
             continue;
         }
@@ -248,7 +293,9 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
     
     
     if (hands[idx].request(hands[from_player_num-1], static_cast<R>(rank_num))) {
+        std::cout<<""<<std::endl;
         std::cout<<"RANK SUCCESSFULLY REQUESTED WAS "<<static_cast<R>(rank_num)<<std::endl;
+        std::cout<<""<<std::endl;
         while (collect_books(player_num)) {}
         return true;
     } else {
@@ -258,11 +305,17 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
             deck.collect(hands[player_num-1]);
             return false;
         } else {
+            std::cout<<""<<std::endl;
             std::cout<<"GO FISH"<<std::endl;
+            std::cout<<""<<std::endl;
             deck >> hands[idx];
             if ((*(--hands[idx].get_end())).rank == static_cast<R>(rank_num)) {
+                std::cout<<"RANK SUCCESSFULLY FISHED WAS "<<static_cast<R>(rank_num)<<std::endl;
+                std::cout<<""<<std::endl;
+                while (collect_books(player_num)) {}
                 return true;
             } else {
+                while (collect_books(player_num)) {}
                 return false;
             }
         }

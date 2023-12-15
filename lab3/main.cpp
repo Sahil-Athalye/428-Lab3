@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 // 	    Yuheng Ding
 // 	    Reedham Kalariya
-// This file creates either a Pinochle game or a holdem game based on user input and allows the user to play the game.
+// This file creates either a Pinochle, HoldEm, or GoFish game based on user input and allows the user to play the game.
 
 #include <iostream>
 #include <memory>
@@ -44,31 +44,28 @@ std::shared_ptr<Game> create(int argc, const char * argv[]){
 
 
 int main(int argc, const char * argv[]){
-    // test
-    UnoDeck unodeck;
-    GoFishGame<Color, UnoRank, UnoDeck> g(argc-2, argv+2);
-    GoFishGame<Suit, PokerRank, PokerDeck> p(argc-2, argv+2);
-    GoFishGame<Suit, PinochleRank, PinochleDeck> pp(argc-2, argv+2);
-
-    // test end
-
     if(argc<2){
         std::cout << "Gameboard inputs were incorrect. Please enter correct game name and correct number of players. Refer to the Usage Messages below." << std::endl;
         std::cout << "Usage Message: ./Lab3 Pinochle <player1_name> <player2_name> <player3_name> <player4_name>" << std::endl;
         std::cout << "Usage Message: ./Lab3 HoldEm <player1_name> <player2_name> <optional_player3_name> <optional_player4_name> <optional_player5_name> <optional_player6_name> <optional_player7_name> <optional_player8_name> <optional_player9_name>" << std::endl;
+        std::cout << "Usage Message: ./Lab3 GoFish <DECK_TYPE> <player1_name> <player2_name> <optional player3_name> <optional player4_name> <optional player5_name>" << std::endl;
+        std::cout<<"DECK_TYPE can be <HoldEm> OR <Pinochle> OR <Uno>"<<std::endl;
         return ERR;
     }
+
     std::shared_ptr<Game> gameboard;
     if((std::string(argv[1]) == "Pinochle") && (argc == 6)){
         gameboard = create(argc, argv);
     } else if ((std::string(argv[1]) == "HoldEm") && (argc <= 11) && (argc>=4)){
         gameboard = create(argc,argv); 
-    } else if ((std::string(argv[1]) == "GoFish") && (argc <= 7) && (argc>=4)){
+    } else if ((std::string(argv[1]) == "GoFish") && (argc <= 8) && (argc>=5)){
         gameboard = create(argc,argv); 
     }else {
         std::cout << "Gameboard inputs were incorrect. Please enter correct game name and correct number of players. Refer to the Usage Messages below." << std::endl;
         std::cout << "Usage Message: ./Lab3 Pinochle <player1_name> <player2_name> <player3_name> <player4_name>" << std::endl;
         std::cout << "Usage Message: ./Lab3 HoldEm <player1_name> <player2_name> <optional_player3_name> <optional_player4_name> <optional_player5_name> <optional_player6_name> <optional_player7_name> <optional_player8_name> <optional_player9_name>" << std::endl;
+        std::cout << "Usage Message: ./Lab3 GoFish <DECK_TYPE> <player1_name> <player2_name> <optional player3_name> <optional player4_name> <optional player5_name>" << std::endl;
+        std::cout<<"DECK_TYPE can be <HoldEm> OR <Pinochle> OR <Uno>"<<std::endl;
         return ERR;
     }
 

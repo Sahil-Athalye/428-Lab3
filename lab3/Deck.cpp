@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 //          Yuheng Ding
 //          Reedham Kalariya
-// This file defines the ______ functions for Deck class
+// This file defines the Shuffle function for Deck class
 #include "Deck.h"
 
 

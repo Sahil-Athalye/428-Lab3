@@ -2,7 +2,7 @@
 // authors: Sahil Athalye
 //          Yuheng Ding
 //          Reedham Kalariya
-// This files declares Deck class
+// This files declares Deck class with one member function shuffle()
 
 #pragma once
 #include <iostream>

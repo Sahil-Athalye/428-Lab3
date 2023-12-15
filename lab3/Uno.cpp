@@ -1,3 +1,9 @@
+// Uno.cpp
+// authors: Sahil Athalye
+//          Yuheng Ding
+//          Reedham Kalariya
+// This files declares operators for Color and UnoRank enum types. It also defines the constructor for UnoDeck
+
 #include "Uno.h"
 
 std::ostream& operator<<(std::ostream &stream, const Color &color){

@@ -64,8 +64,11 @@ void CardSet<R,S>::collect(CardSet<R,S>& cards){
 template <typename R, typename S>
 void CardSet<R,S>::collect_if(CardSet<R,S> & deck, std::function<bool(card_type &)> function){
     std::copy_if(deck.get_start(),deck.get_end(), std::back_inserter(this->cardvec), function);
-    // std::copy_if(deck.get_start(),deck.get_end(), this->get_start(), function);
+
+    //remove replaces values with undefined values - does not shrink vector
     auto it = std::remove_if(deck.get_start(), deck.get_end(), function);
+
+    //erases undefined values leftover by remove
     deck.cardvec.erase(it, deck.cardvec.end());
 }
 
