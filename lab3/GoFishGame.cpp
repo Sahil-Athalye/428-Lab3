@@ -11,6 +11,7 @@
 #define CARDS_EACH_LINE 6
 #define TWO_PLAYER_CARDNUM 7
 #define CLI_ARGS 3
+#define INDEX_PLAYERNUM_OFFSET 1
 
 #include <iostream>
 #include <algorithm>
@@ -62,7 +63,7 @@ int GoFishGame<S, R, D>::play() {
     
     bool last_round = false;
     
-    while(finished_players.size() < hands.size()-1){
+    while(finished_players.size() < hands.size() - INDEX_PLAYERNUM_OFFSET){
         
         std::cout<<""<<std::endl;
         std::cout<<"IT IS ROUND #"<<round_num<<std::endl;
@@ -99,7 +100,7 @@ int GoFishGame<S, R, D>::play() {
     std::cout<<"GAME OVER"<<std::endl;
     std::cout<<""<<std::endl;
 
-    int max_books = -1;
+    int max_books = 0;
     for(unsigned int i = 0; i<books.size();i++){
         if(book_nums[i]>max_books){
             max_books=book_nums[i];
@@ -120,15 +121,8 @@ int GoFishGame<S, R, D>::play() {
             
         }
     }
-
-
-    //TODO STEP 21: need to print players' books and winning player
-
     
     return 1;
-    
-
-
 }
 
 template <typename S, typename R, typename D>
@@ -155,7 +149,7 @@ void GoFishGame<S, R, D>::deal() {
 
 template <typename S, typename R, typename D>
 bool GoFishGame<S, R, D>::collect_books(int player_num){
-    CardSet<R, S> & player_hand = hands[player_num-1];
+    CardSet<R, S> & player_hand = hands[player_num - INDEX_PLAYERNUM_OFFSET];
     std::vector<int> rank_counts(static_cast<int>(R::undefined));
     for(auto iter = player_hand.get_start();iter!=player_hand.get_end();iter++){
         Card<R,S> curr_card = *iter;
@@ -166,6 +160,7 @@ bool GoFishGame<S, R, D>::collect_books(int player_num){
 
     for(unsigned int i = 0; i<rank_counts.size();i++){
         if(rank_counts[i] >= FOUR_OF_A_KIND){
+            //In case hand is initialized with five or more of a kind
             int max_four = 0;
             auto predicate = [i, max_four](Card<R, S>& curr_card) mutable ->bool{
                 R the_rank = static_cast<R>(i);
@@ -177,8 +172,8 @@ bool GoFishGame<S, R, D>::collect_books(int player_num){
                     return false;
                 }
             };
-            books[player_num-1].collect_if(player_hand, predicate);
-            book_nums[player_num-1]++;
+            books[player_num - INDEX_PLAYERNUM_OFFSET].collect_if(player_hand, predicate);
+            book_nums[player_num - INDEX_PLAYERNUM_OFFSET]++;
             return true;
         }
     }
@@ -261,6 +256,8 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
             return card.rank == curr_rank;
         });
 
+        //If player's hand is empty, rank requested need not be in hand
+        //...because there are zero cards in their hand
         if (it == hands[idx].get_end()&& !hands[idx].is_empty()){
             std::cout << "Please input rank currently in hand"<<std::endl;
             continue;
@@ -292,7 +289,7 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
 
     
     
-    if (hands[idx].request(hands[from_player_num-1], static_cast<R>(rank_num))) {
+    if (hands[idx].request(hands[from_player_num - INDEX_PLAYERNUM_OFFSET], static_cast<R>(rank_num))) {
         std::cout<<""<<std::endl;
         std::cout<<"RANK SUCCESSFULLY REQUESTED WAS "<<static_cast<R>(rank_num)<<std::endl;
         std::cout<<""<<std::endl;
@@ -301,8 +298,8 @@ bool GoFishGame<S, R, D>::turn(int player_num) {
     } else {
         if (deck.is_empty()) {
             std::cout << "Player " << player_num << " is removed from the game" << std::endl;
-            finished_players.insert(player_num-1);
-            deck.collect(hands[player_num-1]);
+            finished_players.insert(player_num - INDEX_PLAYERNUM_OFFSET);
+            deck.collect(hands[player_num - INDEX_PLAYERNUM_OFFSET]);
             return false;
         } else {
             std::cout<<""<<std::endl;
